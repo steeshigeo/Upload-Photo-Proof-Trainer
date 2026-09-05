@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Foto Aktivitas M121</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+      --glass-bg: rgba(255, 255, 255, 0.45);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --text-color: #1c1c1e;
+      --input-bg: rgba(255, 255, 255, 0.5);
+      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+      --btn-bg: rgba(255, 255, 255, 0.6);
+    }
+
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --text-color: #f2f2f7;
+      --input-bg: rgba(255, 255, 255, 0.1);
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --btn-bg: rgba(255, 255, 255, 0.15);
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 30px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .theme-toggle {
+      display: flex;
+      background: var(--input-bg);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .theme-toggle button {
+      background: none;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-color);
+      transition: 0.2s;
+    }
+
+    .theme-toggle button.active {
+      background: var(--btn-bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-weight: 600;
+    }
+
+    .date-display {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    select, input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--glass-border);
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      outline: none;
+      backdrop-filter: blur(8px);
+    }
+
+    select option {
+      background: #ffffff;
+      color: #000;
+    }
+
+    [data-theme="dark"] select option {
+      background: #1c1c1e;
+      color: #fff;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      background: #007aff;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+      transition: 0.2s;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    #status {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="glass-card">
+  <div class="header">
+    <h2>M121 Aktivitas</h2>
+    <div class="theme-toggle">
+      <button id="btn-device" onclick="setTheme('device')">💻</button>
+      <button id="btn-light" onclick="setTheme('light')">☀️</button>
+      <button id="btn-dark" onclick="setTheme('dark')">🌙</button>
+    </div>
+  </div>
+
+  <div class="date-display" id="date-display">--</div>
+
+  <form id="upload-form" onsubmit="handleSubmit(event)">
+    <div class="form-group">
+      <label>Nama Staff</label>
+      <select id="namaStaff" required>
+        <option value="" disabled selected>Pilih Staff...</option>
+        <option value="Sulton Setiawan">Sulton Setiawan</option>
+        <option value="Muhamad Angga Jul F.">Muhamad Angga Jul F.</option>
+        <option value="Hartono">Hartono</option>
+        <option value="Eggy Thania A.M">Eggy Thania A.M</option>
+        <option value="Frandy Putra">Frandy Putra</option>
+        <option value="Hilda Ainur Rosyidah">Hilda Ainur Rosyidah</option>
+        <option value="Achmad Rafi Kurnia T.">Achmad Rafi Kurnia T.</option>
+        <option value="Dewi Andansari">Dewi Andansari</option>
+        <option value="Moh Asfiyak Kamida">Moh Asfiyak Kamida</option>
+        <option value="Hyskia Indra Aphista">Hyskia Indra Aphista</option>
+        <option value="Linda Indi Kusumanigrum">Linda Indi Kusumanigrum</option>
+        <option value="Nur Indah Oktaviani S.">Nur Indah Oktaviani S.</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Tujuan Aktivitas</label>
+      <select id="tujuan" required>
+        <option value="" disabled selected>Pilih Tujuan...</option>
+        <option value="Open Studio">📁 Open Studio</option>
+        <option value="Roleplay">📁 Roleplay</option>
+        <option value="Training">📁 Training</option>
+        <option value="Try On Aksara">📁 Try On Aksara</option>
+        <option value="Try On Samudra">📁 Try On Samudra</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Upload Foto</label>
+      <input type="file" id="foto" accept="image/*" required>
+    </div>
+
+    <button type="submit" class="btn-submit" id="btn-submit">Submit</button>
+  </form>
+
+  <div id="status"></div>
+</div>
+
+<script>
+  // Tanggal Lengkap
+  const now = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('date-display').innerText = now.toLocaleDateString('id-ID', options);
+
+  // Appearance / Theme Logic
+  function applyTheme(theme) {
+    document.querySelectorAll('.theme-toggle button').forEach(b => b.classList.remove('active'));
+    
+    if (theme === 'device') {
+      document.getElementById('btn-device').classList.add('active');
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    } else {
+      document.getElementById(theme === 'dark' ? 'btn-dark' : 'btn-light').classList.add('active');
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  }
+
+  function setTheme(theme) {
+    localStorage.setItem('preferred-theme', theme);
+    applyTheme(theme);
+  }
+
+  // Load Saved Theme or Default Device
+  const savedTheme = localStorage.getItem('preferred-theme') || 'device';
+  applyTheme(savedTheme);
+
+  // Auto update if device theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if ((localStorage.getItem('preferred-theme') || 'device') === 'device') {
+      applyTheme('device');
+    }
+  });
+
+  // Submit Handler
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit');
+    const status = document.getElementById('status');
+    const file = document.getElementById('foto').files[0];
+
+    btn.disabled = true;
+    btn.innerText = "Uploading...";
+    status.innerText = "";
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const payload = {
+        namaStaff: document.getElementById('namaStaff').value,
+        tujuan: document.getElementById('tujuan').value,
+        fileData: evt.target.result,
+        mimeType: file.type
+      };
+
+      google.script.run
+        .withSuccessHandler(res => {
+          btn.disabled = false;
+          btn.innerText = "Submit";
+          if(res.success) {
+            status.style.color = "green";
+            status.innerText = "✅ Foto berhasil diunggah!";
+            document.getElementById('upload-form').reset();
+          } else {
+            status.style.color = "red";
+            status.innerText = "❌ Gagal: " + res.error;
+          }
+        })
+        .uploadFileToDrive(payload);
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+
+</body>
+</html>
