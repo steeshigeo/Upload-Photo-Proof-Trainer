@@ -157,6 +157,61 @@
       font-size: 0.85rem;
       font-weight: 500;
     }
+
+    /* Output Laporan & Button Group */
+    .report-box {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--input-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      font-family: inherit;
+    }
+
+    .report-text {
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 0 0 16px 0;
+      line-height: 1.5;
+    }
+
+    .btn-action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-action {
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+
+    .btn-copy {
+      background: var(--btn-bg);
+      color: var(--text-color);
+      border: 1px solid var(--glass-border);
+    }
+
+    .btn-wa {
+      background: #25d366;
+      color: white;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn-action:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
@@ -214,11 +269,25 @@
   </form>
 
   <div id="status"></div>
+
+  <div class="report-box" id="reportBox">
+    <div class="report-text" id="reportText"></div>
+    <div class="btn-action-group">
+      <button class="btn-action btn-copy" onclick="copyTemplateOnly()">
+        📋 Copy Teks
+      </button>
+      <button class="btn-action btn-wa" onclick="copyAndOpenWA()">
+        🚀 Copy & Buka Group WA
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
-  // URL Web App Google Apps Script
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRPnMN_HYnvEttG9s160UEi0Qkco-M9NZe_SRJ1ph-qe8XydPCXdE_KO4H09ycY_P7/exec";
+  const WA_GROUP_LINK = "https://chat.whatsapp.com/L2bw2jkTJ9v0VAErquBeLd?s=cl&p=i&mlu=4&ilr=4";
+
+  let generatedTemplate = "";
 
   // Display Tanggal Lengkap
   const now = new Date();
@@ -228,7 +297,6 @@
   // Theme Logic
   function applyTheme(theme) {
     document.querySelectorAll('.theme-toggle button').forEach(b => b.classList.remove('active'));
-    
     if (theme === 'device') {
       document.getElementById('btn-device').classList.add('active');
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -253,22 +321,37 @@
     }
   });
 
+  // Format Waktu Laporan
+  function getFormattedDateTime() {
+    const d = new Date();
+    const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateStr = d.toLocaleDateString('id-ID', opts);
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${dateStr} ${hours}:${minutes}`;
+  }
+
   // Submit Handler
   function handleSubmit(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-submit');
     const status = document.getElementById('status');
+    const reportBox = document.getElementById('reportBox');
     const file = document.getElementById('foto').files[0];
 
     btn.disabled = true;
     btn.innerText = "Uploading...";
     status.innerText = "";
+    reportBox.style.display = "none";
+
+    const namaStaff = document.getElementById('namaStaff').value;
+    const tujuan = document.getElementById('tujuan').value;
 
     const reader = new FileReader();
     reader.onload = function(evt) {
       const payload = {
-        namaStaff: document.getElementById('namaStaff').value,
-        tujuan: document.getElementById('tujuan').value,
+        namaStaff: namaStaff,
+        tujuan: tujuan,
         fileData: evt.target.result,
         mimeType: file.type
       };
@@ -284,6 +367,14 @@
         if(res.success) {
           status.style.color = "green";
           status.innerText = "✅ Foto berhasil diunggah!";
+          
+          // Buat Template Laporan
+          const waktuUpload = getFormattedDateTime();
+          generatedTemplate = `📌 LAPORAN FOTO AKTIVITAS M121\n👤 Nama Staff: ${namaStaff}\n📁 Tujuan Aktivitas: ${tujuan}\n🕒 Waktu Upload: ${waktuUpload}\n🔗 Link Foto: ${res.url}`;
+
+          document.getElementById('reportText').innerText = generatedTemplate;
+          reportBox.style.display = "block";
+          
           document.getElementById('upload-form').reset();
         } else {
           status.style.color = "red";
@@ -299,6 +390,26 @@
       });
     };
     reader.readAsDataURL(file);
+  }
+
+  // Copy Teks saja
+  function copyTemplateOnly() {
+    if (!generatedTemplate) return;
+    navigator.clipboard.writeText(generatedTemplate).then(() => {
+      alert("✅ Teks laporan berhasil disalin!");
+    }).catch(() => {
+      alert("❌ Gagal menyalin teks.");
+    });
+  }
+
+  // Copy Teks & Buka Link Group WA
+  function copyAndOpenWA() {
+    if (!generatedTemplate) return;
+    navigator.clipboard.writeText(generatedTemplate).then(() => {
+      window.open(WA_GROUP_LINK, '_blank');
+    }).catch(() => {
+      window.open(WA_GROUP_LINK, '_blank');
+    });
   }
 </script>
 
