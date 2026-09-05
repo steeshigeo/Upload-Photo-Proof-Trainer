@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard Foto Aktivitas M121</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
       --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
@@ -35,6 +36,7 @@
       align-items: center;
       color: var(--text-color);
       transition: all 0.3s ease;
+      box-sizing: border-box;
     }
 
     .glass-card {
@@ -153,6 +155,7 @@
       margin-top: 15px;
       text-align: center;
       font-size: 0.85rem;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -214,12 +217,15 @@
 </div>
 
 <script>
-  // Tanggal Lengkap
+  // URL Web App Google Apps Script
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRPnMN_HYnvEttG9s160UEi0Qkco-M9NZe_SRJ1ph-qe8XydPCXdE_KO4H09ycY_P7/exec";
+
+  // Display Tanggal Lengkap
   const now = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   document.getElementById('date-display').innerText = now.toLocaleDateString('id-ID', options);
 
-  // Appearance / Theme Logic
+  // Theme Logic
   function applyTheme(theme) {
     document.querySelectorAll('.theme-toggle button').forEach(b => b.classList.remove('active'));
     
@@ -238,11 +244,9 @@
     applyTheme(theme);
   }
 
-  // Load Saved Theme or Default Device
   const savedTheme = localStorage.getItem('preferred-theme') || 'device';
   applyTheme(savedTheme);
 
-  // Auto update if device theme changes
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
     if ((localStorage.getItem('preferred-theme') || 'device') === 'device') {
       applyTheme('device');
@@ -269,20 +273,30 @@
         mimeType: file.type
       };
 
-      google.script.run
-        .withSuccessHandler(res => {
-          btn.disabled = false;
-          btn.innerText = "Submit";
-          if(res.success) {
-            status.style.color = "green";
-            status.innerText = "✅ Foto berhasil diunggah!";
-            document.getElementById('upload-form').reset();
-          } else {
-            status.style.color = "red";
-            status.innerText = "❌ Gagal: " + res.error;
-          }
-        })
-        .uploadFileToDrive(payload);
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerText = "Submit";
+        if(res.success) {
+          status.style.color = "green";
+          status.innerText = "✅ Foto berhasil diunggah!";
+          document.getElementById('upload-form').reset();
+        } else {
+          status.style.color = "red";
+          status.innerText = "❌ Gagal: " + res.error;
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerText = "Submit";
+        status.style.color = "red";
+        status.innerText = "❌ Gagal mengunggah foto. Periksa koneksi internet.";
+        console.error(err);
+      });
     };
     reader.readAsDataURL(file);
   }
